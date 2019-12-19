@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+  queue:
+    restart: always
+    image: redis:latest
+    expose:
+      - "6379"
+  web:
+    container_name: queue_api
+    build: .
+    links:
+      - queue:redis
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - queue
+      - db
